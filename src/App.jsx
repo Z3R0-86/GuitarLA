@@ -5,7 +5,7 @@ import Guitar from './Guitar'
 import { db } from './data/db'
 
 function App() {
-  const [data, setData] = useState(db)
+  const [data] = useState(db)
   const [cart, setCart] = useState(() => {
     const storedCart = localStorage.getItem('cart')
     return storedCart ? JSON.parse(storedCart) : []
