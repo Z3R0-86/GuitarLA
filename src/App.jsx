@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import Header from './Componentes/Header'
 import Guitar from './Guitar'
@@ -6,7 +6,16 @@ import { db } from './data/db'
 
 function App() {
   const [data, setData] = useState(db)
-  const [cart, setCart] = useState([])
+  const [cart, setCart] = useState(() => {
+    const storedCart = localStorage.getItem('cart')
+    return storedCart ? JSON.parse(storedCart) : []
+  })
+
+  //Guardar carrito en localStorage cada vez que cambie
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart))
+  }, [cart])
+
 
   // Agregar guitarra al carrito
   function addToCart(product) {
@@ -15,7 +24,7 @@ function App() {
     if (itemExists) {
       setCart(cart.map(item =>
         item.id === product.id
-          ? { ...item, quantity: item.quantity + 1 }
+          ? { ...item, quantity: Math.min(item.quantity + 1, 10) }
           : item
       ))
     } else {
@@ -33,8 +42,9 @@ function App() {
     setCart(prevCart =>
       prevCart.map(item =>
         item.id === id
-          ? { ...item, quantity: Math.max(item.quantity + delta, 1) }
-          : item
+          ? { ...item, quantity: Math.max(1, Math.min(item.quantity + delta, 10))
+          }
+            : item
       )
     )
   }
